@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { TodoList } from './components/TodoList';
 import { TodoFilter } from './components/TodoFilter';
+import { useSelector, useDispatch } from 'react-redux';
+import { actionCreators } from './store/reducers/todoReducer';
 
 const filters = {
   all: 'All',
@@ -15,18 +17,19 @@ function App() {
   const [activeCount, setActiveCount] = useState(0);
   const [title, setTitle] = useState('');
   const [isSelected, setIsSelected] = useState(filters.all);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (localStorage.todos) {
-      setTodos(JSON.parse(localStorage.getItem('todos')));
-      setActiveCount(JSON.parse(localStorage.getItem('count')));
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.todos) {
+  //     setTodos(JSON.parse(localStorage.getItem('todos')));
+  //     setActiveCount(JSON.parse(localStorage.getItem('count')));
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
-    localStorage.setItem('count', JSON.stringify(activeCount));
-  }, [todos, activeCount]);
+  // useEffect(() => {
+  //   localStorage.setItem('todos', JSON.stringify(todos));
+  //   localStorage.setItem('count', JSON.stringify(activeCount));
+  // }, [todos, activeCount]);
 
   const filteredTodos = useCallback((selected = isSelected) => {
     if (selected === active) {
@@ -40,6 +43,8 @@ function App() {
     return todos.filter(todo => todo.title);
   }, [todos, isSelected]);
 
+  // const todosList = useSelector(state => state.todosList);
+
   const addTodo = () => {
     const todo = {
       title,
@@ -51,14 +56,15 @@ function App() {
       return;
     }
 
-    setTodos([...todos, todo]);
-    setTitle('');
-    setActiveCount(activeCount + 1);
+    const action = actionCreators.addTodo(todo);
+    dispatch(action);
   };
 
   const clearComleted = () => {
     setTodos(todos.filter(todo => !todo.completed));
   };
+
+  const todosList = useSelector(state => console.log(state.todosList));
 
   return (
     <section className="todoapp">
